@@ -30,6 +30,7 @@ test_urlparse.py provides a good indicator of parsing behavior.
 import re
 import sys
 import collections
+import argparse
 
 __all__ = ["urlparse", "urlunparse", "urljoin", "urldefrag",
            "urlsplit", "urlunsplit", "urlencode", "parse_qs",
@@ -1006,3 +1007,16 @@ def splitvalue(attr):
     """splitvalue('attr=value') --> 'attr', 'value'."""
     attr, delim, value = attr.partition('=')
     return attr, (value if delim else None)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('url', type=str)
+    args = parser.parse_args()
+    parsed = urlparse(args.url)
+    if (not parsed.scheme) and (not args.url.startswith("/")):
+        parsed = urlparse('//' + args.url)
+    keys = ['scheme', 'hostname', 'port', 'path', 'params', 'query', 'fragment']
+    for key in keys:
+        value = getattr(parsed, key)
+        if value:
+            print("%s=%s" % (key, value))
